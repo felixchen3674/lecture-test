@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - main
-    # ✨ 核心隔离：只有当 react-foundation 里的文件变化时，才触发整条流水线
+    # Core isolation: Only trigger the pipeline when files in react-foundation change
     paths:
-      - 'react-foundation/**'
+      - "react-foundation/**"
   pull_request:
     branches:
       - main
     paths:
-      - 'react-foundation/**'
+      - "react-foundation/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   # ==========================================
-  # 第一阶段：CI (持续集成) - 负责检查和打包
+  # Phase 1: CI (Continuous Integration) - Responsible for checking and building
   # ==========================================
   build-and-test:
     runs-on: ubuntu-latest
@@ -30,9 +30,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: 'react-foundation/package-lock.json'
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "react-foundation/package-lock.json"
 
       - name: Install dependencies
         working-directory: ./react-foundation
@@ -42,7 +42,7 @@ jobs:
         working-directory: ./react-foundation
         run: npm run lint
 
-      # 如果你有测试，可以取消下面这两行的注释
+      # Uncomment the following lines if you have tests
       # - name: Run tests
       #   working-directory: ./react-foundation
       #   run: npm test -- --run
@@ -51,27 +51,27 @@ jobs:
         working-directory: ./react-foundation
         run: npm run build
 
-      # 将打包好的 dist 文件夹上传，专供 GitHub Pages 部署使用
+      # Upload the built dist folder for GitHub Pages deployment
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./react-foundation/dist
 
   # ==========================================
-  # 第二阶段：CD (持续部署) - 只有推送到 main 才部署
+  # Phase 2: CD (Continuous Deployment) - Only deploy when pushed to main
   # ==========================================
   deploy-to-pages:
-    # 保证 PR 不会触发部署，只有合并到 main 才会部署
+    # Ensure PRs do not trigger deployment, only merging to main will deploy
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build-and-test # 必须等上面的 build 成功才能跑
+    needs: build-and-test # Must wait for the above build to succeed before running
     runs-on: ubuntu-latest
-    
-    # 环境配置：对应 GitHub 仓库里的 Environment 设置
+
+    # Environment configuration: Corresponds to Environment settings in the GitHub repository
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
-    # 部署到 GitHub Pages 所需的权限
+    # Permissions required for deploying to GitHub Pages
     permissions:
       pages: write
       id-token: write
