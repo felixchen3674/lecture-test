@@ -5,8 +5,8 @@ on:
     branches:
       - main
     # ✨ 核心隔离：只有当 react-foundation 里的文件变化时，才触发整条流水线
-    # paths:
-    #   - 'lecture-test/react-foundation/**'
+    paths:
+      - 'lecture-test/react-foundation/**'
   pull_request:
     branches:
       - main
