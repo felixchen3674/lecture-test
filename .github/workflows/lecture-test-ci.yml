@@ -1,4 +1,7 @@
-# name: Lecture Test CI
+name: Lecture Test CI
+
+on:
+  workflow_dispatch:
 
 # on:
 #   push:
